@@ -1,5 +1,5 @@
 import curses
-from qbox import qbox
+from qdo.qbox import qbox
 
 from curses.textpad import rectangle
 
