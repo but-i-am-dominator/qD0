@@ -1,8 +1,8 @@
 import curses
-from qdo.qbox import qbox
+
+from qbox import qbox
 
 from curses.textpad import rectangle
-
 
 lop = ["Project 1", "Project 2", "Project 3"]
 
