@@ -163,3 +163,7 @@ cython_debug/
 
 # Scratch File
 scratch
+
+# SQLite Databases
+qD0.db
+.db

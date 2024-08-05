@@ -11,9 +11,6 @@ class project:
         return (str(now.strftime("%Y-%m-%d")), str(now.strftime("%H:%M:%S")))
     
 
-
-
-
 class task:
 
     def __init__(self, name, project):

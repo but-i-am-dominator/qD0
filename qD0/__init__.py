@@ -21,3 +21,5 @@ from qD0.project import project
 from qD0.project import task
 from qD0.qbox import qbox
 from curses.textpad import Textbox
+from qD0.data_manage import DatabaseManager
+from qD0.data_manage import project_table

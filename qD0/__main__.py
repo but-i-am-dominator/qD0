@@ -1,8 +1,9 @@
 import curses
-
+import os
 from qbox import qbox
-
 from curses.textpad import rectangle
+from data_manage import DatabaseManager
+from data_manage import project_table
 
 lop = ["Project 1", "Project 2", "Project 3"]
 
@@ -127,6 +128,14 @@ def main_screen(stdscr):
 
 def main(stdscr):
     '''Main Function'''
+    
+    # Checks if DB file exists.
+    if os.path.exists('qD0.db'):
+        pass
+    else:
+        db_manager = DatabaseManager('qD0.db')
+        db_manager.create_tables()
+    
     stdscr.clear()
     stdscr.refresh()
     curses.start_color()
