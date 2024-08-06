@@ -1,6 +1,8 @@
 import curses
 import os
 import json
+import time
+from spotipy import SpotifyOauthError
 from qbox import qbox
 from curses.textpad import rectangle
 from data_manage import DatabaseManager
@@ -147,8 +149,11 @@ def main(stdscr):
         db_manager = DatabaseManager('qD0.db')
         db_manager.create_tables()
     
+
     stdscr.clear()
     stdscr.refresh()
+    
+    # Curses Color Pairs
     curses.start_color()
     curses.init_pair(1, curses.COLOR_YELLOW, curses.COLOR_BLACK)
     curses.init_pair(2, curses.COLOR_BLUE, curses.COLOR_BLACK)
@@ -162,8 +167,12 @@ def main(stdscr):
     with open("spotify.json") as file:
         data = json.load(file)
 
-    spot = qDify(data)
-    spotify_data = spot.get_currently_playing_track()
+    try:
+       spot = qDify(data)
+       spotify_data = spot.get_currently_playing_track()
+       prev_song_info = spotify_data[0]
+    except SpotifyOauthError:
+        spotify_data = None
 
     # Window Width
     project_col_width = int(width * 0.15)
@@ -179,8 +188,21 @@ def main(stdscr):
     tasks_win = create_window(height - 2,  tasks_col_width, 1, project_col_width, task_title)
     details_win = create_window(height - 2,  details_col_width, 1, project_col_width + tasks_col_width, detail_title)
     main_screen(stdscr, spotify_data)
-    
+    stdscr.nodelay(1)
+    last_refresh = time.time()
+    refresh_interval = 10
+
     while True:
+        now = time.time()
+        if now - last_refresh >= refresh_interval:
+            try:
+                spot = qDify(data)
+                spotify_data = spot.get_currently_playing_track()
+                if prev_song_info != spotify_data[0]:
+                    main_screen(stdscr, spotify_data)
+                    prev_song_info = spotify_data[0]
+            except SpotifyOauthError:
+                spotify_data = None
         key = stdscr.getch()
         # Move between windows
         if key == curses.KEY_F2:
@@ -193,9 +215,18 @@ def main(stdscr):
             project = new_project(stdscr)
             if project != None:
                 lop.append(project)
-            main_screen(stdscr)
+            try:
+                spot = qDify(data)
+                spotify_data = spot.get_currently_playing_track()
+            except SpotifyOauthError:
+            # Checks if .cache file exists from Spotipy integration.
+                #if os.path.exists('.cache'):
+                    #os.remove('.cache')
+                spotify_data = None
+            main_screen(stdscr, spotify_data)
         elif key == ord('q'):
             break
+        time.sleep(0.1)
     
 if __name__ == "__main__":
     curses.wrapper(main)
