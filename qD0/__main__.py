@@ -1,23 +1,34 @@
 import curses
 import os
+import json
 from qbox import qbox
 from curses.textpad import rectangle
 from data_manage import DatabaseManager
 from data_manage import project_table
+from qDify import qDify
 
 lop = ["Project 1", "Project 2", "Project 3"]
 
 
 
 
-def m1_draw_top(stdscr, width):
+def m1_draw_top(stdscr, width, spotify):
     '''Draw the top of the working menu.'''
     title = "qD0 - Task Manager for the Command Line!"
     version = "Version: 0.1"
-    full = title + " " * (width - len(title) - len(version) - 3) + version 
-    if width > (len(title) + len(version) + 3):
-        stdscr.addstr(0, 3, full, curses.color_pair(2))
-        stdscr.refresh()
+    if spotify == None:
+        full = title + " " * (width - len(title) - len(version) - 3) + version 
+        if width > (len(title) + len(version) + 3):
+            stdscr.addstr(0, 3, full, curses.color_pair(2))
+            stdscr.refresh()
+    else:
+        track_name = spotify[0]
+        artist_name = spotify[1]
+        full = "qD0" + " " * 10 + track_name + "  by  " + artist_name 
+        if width > len(full):
+            stdscr.addstr(0, 3, "qD0" + " " * 10, curses.color_pair(2))
+            stdscr.addstr(0, 16, track_name + "  by  " + artist_name, curses.color_pair(5))
+            stdscr.refresh()
     return True
 
 def m1_draw_bottom(stdscr, width, height):
@@ -96,12 +107,12 @@ def new_project(stdscr):
         return text
 
 
-def main_screen(stdscr):
+def main_screen(stdscr, spotify_data):
     '''Reset Main Screen.'''
     stdscr.clear()
     height, width = stdscr.getmaxyx()
     # Draw the Top of the Menu
-    m1_draw_top(stdscr, width)
+    m1_draw_top(stdscr, width, spotify_data)
     # Draw the Bottom of the Menu
     m1_draw_bottom(stdscr, width, height)
     
@@ -143,9 +154,17 @@ def main(stdscr):
     curses.init_pair(2, curses.COLOR_BLUE, curses.COLOR_BLACK)
     curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_BLACK)
     curses.init_pair(4, curses.COLOR_GREEN, curses.COLOR_BLACK)
+    curses.init_pair(5, curses.COLOR_WHITE, curses.COLOR_GREEN)
 
     height, width = stdscr.getmaxyx()
     
+    # Spotify Integration
+    with open("spotify.json") as file:
+        data = json.load(file)
+
+    spot = qDify(data)
+    spotify_data = spot.get_currently_playing_track()
+
     # Window Width
     project_col_width = int(width * 0.15)
     tasks_col_width = int(width * 0.30)
@@ -159,7 +178,7 @@ def main(stdscr):
     project_win = create_window(height - 2, project_col_width, 1, 0, project_title)
     tasks_win = create_window(height - 2,  tasks_col_width, 1, project_col_width, task_title)
     details_win = create_window(height - 2,  details_col_width, 1, project_col_width + tasks_col_width, detail_title)
-    main_screen(stdscr)
+    main_screen(stdscr, spotify_data)
     
     while True:
         key = stdscr.getch()

@@ -167,3 +167,6 @@ scratch
 # SQLite Databases
 qD0.db
 .db
+
+# Spotify Creds
+spotify.json

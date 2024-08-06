@@ -23,3 +23,4 @@ from qD0.qbox import qbox
 from curses.textpad import Textbox
 from qD0.data_manage import DatabaseManager
 from qD0.data_manage import project_table
+from qD0.qDify import qDify
