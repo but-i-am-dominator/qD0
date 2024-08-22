@@ -3,7 +3,7 @@ from datetime import datetime
 class project:
     """Builder design."""
 
-    def __init__(self, name, creation_date=None):
+    def __init__(self, name, details=None, creation_date=None, list_tasks=None):
         self.name = name
         self.creation_date = self.set_creation_date(creation_date)
         # Everything else
